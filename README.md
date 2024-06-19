@@ -10,4 +10,5 @@ The contanier recive three volumes:
 
 ## Usage
 Simply run
+
 docker run --rm -v /path/local/input/:/input -v /path/local/output/:/output -v /path/to-store/videos-orignales/:/videos_originales luisfeser/photo-video-organizer
