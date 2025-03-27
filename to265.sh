@@ -1,6 +1,6 @@
 #!/bin/bash
 # hacer loop con todos los archivos del directorio
-# /home/luisfe/Videos/pasar_h265/
+# /home/luisfe/Videos/pasar_AV1/
 
 # primera carpeta el origen de los archivos
 # segunda carpeta el destino donde tendrá la estructura de sortphotos
@@ -34,6 +34,9 @@ origen="/input"
 destino="/output"
 videos_originales="/videos_originales"
 
+# número de hilos de procesador
+THREADS=$(nproc)
+
 # para tratar los espacios en los ficheros
 OIFS="$IFS"
 IFS=$'\n'
@@ -47,7 +50,7 @@ videoextensions="avi mp4 mov mkv MTS"
 # mkdir /media/almacen/videos_originales
 # mkdir "$destino"
 
-# for file in $(find "$origen" -type f \( -iname "*.mp4" ! -iname "*_h265*" \) -or -iname "*.MTS"); do
+# for file in $(find "$origen" -type f \( -iname "*.mp4" ! -iname "*_AV1*" \) -or -iname "*.MTS"); do
 # cambio la forma de recorrer el for para ir moviendo cada fichero a su sitio
 for file in $(find "$origen" -type f); do
 	#sudo chown luisfe:luisfe "$file";
@@ -93,15 +96,15 @@ for file in $(find "$origen" -type f); do
 		# primero cojo la extensión
 		extension="${filename##*.}"
 		if echo "$videoextensions" | grep -q "\s$extension\s"; then
-			#echo "es un video, compruebo si ya está h265"
+			#echo "es un video, compruebo si ya está AV1"
 			#if ffmpeg -i "$file" 2>&1 | grep -qE "hevc|H.265"; then
 
-			#	echo ""$file" ya está codificado en h265, lo muevo a su destino"
+			#	echo ""$file" ya está codificado en AV1, lo muevo a su destino"
 			#	touch -m -d "$fecha" "$file"
 			#	chmod 664 "$file"
 			#	mv -f "$file" "$destino/$year/$month/"
 			#else
-				echo "Convirtiendo $file a h265..."
+				echo "Convirtiendo $file a AV1..."
 				# coger la fecha original del archivo
 				# cambio la manera de coger la fecha:
 				# fecha=`find "$file" -maxdepth 0 -printf "%TY-%Tm-%Td %TH:%TM:%.2TS\n"`;
@@ -116,14 +119,14 @@ for file in $(find "$origen" -type f); do
 				echo "el nombre del fichero es $NOMBRE_ARCHIVO";
 				echo "la fecha es $fecha";
 
-				NOMBRE_FINAL=`printf '%s\n' "${file%.mp4}_h265.mp4"`;
+				NOMBRE_FINAL=`printf '%s\n' "${file%.mp4}_AV1.mp4"`;
 				echo "el nombre final será: $NOMBRE_FINAL"
 				# touch -d "$fecha" "$NOMBRE_FINAL";
 				# chmod ugo+w "$NOMBRE_FINAL";
 				NOMBRE_ARCHIVO_FINAL="$(basename -- "$NOMBRE_FINAL")";
 				echo "el nombre archivo final será: $NOMBRE_ARCHIVO_FINAL"
 
-				#comprobar si el archivo _h265 existe para no volver a convertirlo
+				#comprobar si el archivo _AV1 existe para no volver a convertirlo
 				if [ -f "${destino}/${year}/${month}/${NOMBRE_ARCHIVO_FINAL}" ]; then
 					echo "el archivo ya se convirtió en su momento, lo muevo a videos originales"
 					mv -f "$file" $videos_originales;
@@ -132,7 +135,8 @@ for file in $(find "$origen" -type f); do
 					RUTA_COMPLETA="$(realpath -s "$file")";
 					DIR_A_MONTAR="$(dirname "$RUTA_COMPLETA")";
 					echo "se montará el directorio $DIR_A_MONTAR"
-					ffmpeg -y -i "$file" -map_metadata 0 -c:v libx265 -crf 28 -acodec copy "$NOMBRE_FINAL";
+					# ffmpeg -y -i "$file" -map_metadata 0 -c:v libx265 -crf 28 -acodec copy "$NOMBRE_FINAL";
+					ffmpeg -y -i "$file" -map_metadata 0 -c:v libsvtav1 -crf 38 -preset 6 -threads "$THREADS" -pix_fmt yuv420p -c:a copy -movflags +faststart "$NOMBRE_FINAL";
 					chmod ugo+w "$NOMBRE_FINAL";
 					touch -m -d "$fecha" "$NOMBRE_FINAL";
 					mv -f "$NOMBRE_FINAL" "$destino/$year/$month/"
