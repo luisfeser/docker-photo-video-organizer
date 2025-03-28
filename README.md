@@ -1,6 +1,6 @@
 # Docker photo video organizer (and optimizer)
 Is a docker image that organize photos and videos in year/month folder hierarchy
-Also it convert videos into an optimized H265 codec saving a lot of space. A video of 1G can be reduced to 100-200Mb, easyly a 80%.
+Also it convert videos into an optimized AV1 codec saving a lot of space. A video of 1G can be reduced to 100-200Mb, easyly a 80%.
 The date of photo/video is obtanied from the exif data, not filesystem creation or modification.
 
 Sample of folder structure:
@@ -22,7 +22,7 @@ Sample of folder structure:
     |   `-- 2024
     |       `-- 06
     |           |-- IMG_20170825_195317.jpg
-    |           |-- PXL_20240607_185952040_h265.mp4  # The optimized video
+    |           |-- PXL_20240607_185952040_AV1.mp4  # The optimized video
     |-- input # result is empty
     `-- videos-originales
         `-- PXL_20240607_185952040.mp4  # The original video
